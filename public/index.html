@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShicoPork</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="username-container">
+        <h1>Welcome to ShicoPork!</h1>
+        <input id="username-input" type="text" placeholder="Enter your username" autocomplete="off">
+        <button id="joinButton" class="button">Join</button>
+        <div id="instructions">
+            <h2>How to Play</h2>
+            <p>Use the arrow keys to move your character.</p>
+            <p>Collect coins and keys to unlock doors and progress to the next level.</p>
+            <p>Work together with your friends to solve puzzles and reach new heights!</p>
+            <p>Press the spacebar to attach and detach the rope.</p>
+        </div>
+    </div>
+    <div id="room-code-container">
+        <button id="createRoomButton" class="button">Create Room</button>
+        <input id="room-code-input" type="text" placeholder="Enter room code" autocomplete="off">
+        <button id="joinRoomButton" class="button">Join Room</button>
+    </div>
+    <div id="game-container">
+        <canvas id="gameCanvas" width="1000" height="800"></canvas>
+        <div id="score">Score: 0</div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <!--  Ain't that much of a good design but basic enough :>-->
+    <script src="js/game.js"></script>
+</body>
+</html>
