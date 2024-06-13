@@ -2,7 +2,7 @@
 
 Welcome to ShicoPork Multiplayer, a multiplayer platformer game project.
 
-![SHICOPORK](images/Player.png)
+![SHICOPORK](public/images/Player.png)
 
 ## Table of Contents
 
