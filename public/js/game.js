@@ -16,7 +16,6 @@
 // - IDK.
 
 
-// Idk if i should make a Readme Markdown file.. idk lets see.
 
 
 
@@ -58,7 +57,7 @@ const groundHeight = 50;
 const barrierWidth = 50;
 
 // Movable square
-const square = { x: 400, y: 700, width: 50, height: 50, xVelocity: 0, yVelocity: 0 };
+const square = { x: 400, y: 700, width: 50, height: 50, xVelocity: 0, yVelocity: 0, held: false };
 
 // Pressure plate
 const pressurePlate = { x: 350, y: 750, width: 50, height: 10, activated: false };
@@ -137,7 +136,7 @@ function updateGame() {
     requestAnimationFrame(updateGame);
 }
 
-function drawLevel() {  // making the basic level, idk how i did this, but yes, i also gotta make a top barrier
+function drawLevel() { // making the basic level, idk how i did this, but yes, i also gotta make a top barrier
     context.fillStyle = '#000';
     context.fillRect(50, 750, 900, 50); // Ground
     context.fillRect(200, 650, 100, 20); // Platform
@@ -232,15 +231,15 @@ function applyPhysics() {
             square.y = canvas.height - groundHeight - square.height;
             square.yVelocity = 0;
         }
+
+        // Update square's position
+        square.x += square.xVelocity;
+        square.y += square.yVelocity;
+
+        // Apply friction to the square
+        square.xVelocity *= friction;
+        square.yVelocity *= friction;
     }
-
-    // Update square's position.
-    square.x += square.xVelocity;
-    square.y += square.yVelocity;
-
-    // Apply friction to the square.
-    square.xVelocity *= friction;
-    square.yVelocity *= friction;
 }
 
 function checkPlatformCollision(player) {
@@ -286,30 +285,41 @@ function checkCollisions() {
         // Door unlocking
         if (key.collected && door.open && isColliding(player, door, 50)) {
             alert('Level Completed!');
-            // Reset for next level or load new level ( THERE IS ONLY ONE LEVEL FOR NOW )
+             // Reset for next level or load new level ( THERE IS ONLY ONE LEVEL FOR NOW )
             key.collected = false;
             door.open = false;
             for (let playerId in players) {
                 players[playerId].x = 50;
                 players[playerId].y = 700;
             }
-            generateCoins();
         }
 
-        // Pressure plate
-        if (isColliding(player, pressurePlate, pressurePlate.width)) {
+        // Player interaction with the square
+        if (isColliding(player, square, square.width)) {
+            if (player.y + playerSize.height <= square.y + 10) { // Player is above the square
+                player.y = square.y - playerSize.height;
+                player.yVelocity = 0;
+                isOnGround = true;
+            } else if (player.x + playerSize.width <= square.x + 10) { // Player is left of the square
+                player.x = square.x - playerSize.width;
+                square.held = true;
+                square.xVelocity = player.xVelocity;
+            } else if (player.x >= square.x + square.width - 10) { // Player is right of the square
+                player.x = square.x + square.width;
+                square.held = true;
+                square.xVelocity = player.xVelocity;
+            } else if (player.y >= square.y + square.height - 10) { // Player is below the square
+                player.y = square.y + square.height;
+                player.yVelocity = 0;
+            }
+        } else {
+            square.held = false;
+        }
+
+        // Check if the square is on the pressure plate
+        if (isColliding(square, pressurePlate, pressurePlate.width)) {
             pressurePlate.activated = true;
         }
-
-        // Movable square collision SAME SHIT ASS BUG
-        if (isColliding(player, square, square.width)) {
-            moveSquareWithPlayer(player);
-        }
-    }
-
-    // Check if the square is on the pressure plate, THIS SHIT STILL HAS BUGS BECAUSE IDFK 
-    if (isColliding(square, pressurePlate, pressurePlate.width)) {
-        pressurePlate.activated = true;
     }
 
     if (pressurePlate.activated) {
@@ -326,20 +336,6 @@ function isColliding(object1, object2, size) {
         object1.y + playerSize.height > object2.y;
 }
 
-function moveSquareWithPlayer(player) {
-    if (player.xVelocity > 0) {
-        square.x += player.xVelocity;
-    } else if (player.xVelocity < 0) {
-        square.x += player.xVelocity;
-    }
-
-    if (player.yVelocity > 0) {
-        square.y += player.yVelocity;
-    } else if (player.yVelocity < 0) {
-        square.y += player.yVelocity;
-    }
-}
-
 function generateCoins() {
     coins.length = 0;
     for (let i = 0; i < 10; i++) {
@@ -347,7 +343,7 @@ function generateCoins() {
         do {
             coinX = Math.random() * (canvas.width - 20) + 10;
             coinY = Math.random() * (canvas.height - 300) + 50;
-        } while (isInsideBarrier(coinX, coinY)); // Check if the coin is inside a barrier yes...
+        } while (isInsideBarrier(coinX, coinY)); // // Check if the coin is inside a barrier yes...
         coins.push({ x: coinX, y: coinY });
     }
 }
@@ -372,7 +368,7 @@ document.addEventListener('keydown', (e) => {
         case 'ArrowUp':
             // Only allow jumping when the player is on the ground - or else the players would be flying
             if (isOnGround) {
-                player.yVelocity = -15; // Increase jump force to 15 pixels, 28 is the one i personally used on this project but uh, i will make a map builder ingame for this.. so yea -15 for now
+                player.yVelocity = -15; // Increase jump force to 15 pixels ( Recommended jump force = -28 for the game)
                 isOnGround = false;
             }
             break;
