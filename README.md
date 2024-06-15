@@ -32,7 +32,7 @@ To run ShicoPork Multiplayer locally, follow these steps:
 
    ```bash
    git clone https://github.com/ReyGraph/shicopork.git
-   cd ShicoPork-Multiplayer
+   cd shicopork
 
 
 ## Install dependencies:
